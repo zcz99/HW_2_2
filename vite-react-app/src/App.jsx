@@ -1,37 +1,72 @@
+import styles from './app.module.css';
+import data from './data.json';
 import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
-import { CurrentYear } from './my components/Current Year.jsx';
 
-function App() {
-	const [count, setCount] = useState(0); // декларативный стиль и весь JSX также
+export const App = () => {
+	const [activeIndex, setActiveIndex] = useState(0);
+
+	function HandleClickForward() {
+		if (activeIndex === data.length - 1) {
+			setActiveIndex(0);
+		} else {
+			setActiveIndex(activeIndex + 1);
+		}
+	}
+
+	function HandleClickBack() {
+		setActiveIndex(activeIndex - 1);
+	}
 
 	return (
-		<>
-			<div>
-				<a href="https://vite.dev" target="_blank">
-					<img src={viteLogo} className="logo" alt="Vite logo" />
-				</a>
-				<a href="https://react.dev" target="_blank">
-					<img src={reactLogo} className="logo react" alt="React logo" />
-				</a>
+		<div className={styles.container}>
+			<div className={styles.card}>
+				<h1>Инструкция по готовке пельменей</h1>
+				<div className={styles.steps}>
+					<div className={styles['steps-content']}>
+						{data[`${activeIndex}`].content}
+					</div>
+					<ul className={styles['steps-list']}>
+						{data.map(({ title, id }, index) => (
+							<li
+								key={id}
+								className={
+									(index > activeIndex && styles['steps-item']) ||
+									(index < activeIndex &&
+										styles['steps-item'] + ' ' + styles.done) ||
+									(index === activeIndex &&
+										styles['steps-item'] +
+											' ' +
+											styles.done +
+											' ' +
+											styles.active)
+								}
+							>
+								<button
+									className={styles['steps-item-button']}
+									onClick={() => {
+										setActiveIndex(index);
+									}}
+								>
+									{id.slice(2)}
+								</button>
+								{title}
+							</li>
+						))}
+					</ul>
+					<div className={styles['buttons-container']}>
+						<button
+							disabled={activeIndex === 0 ? true : false}
+							className={styles.button}
+							onClick={HandleClickBack}
+						>
+							Назад
+						</button>
+						<button className={styles.button} onClick={HandleClickForward}>
+							{activeIndex <= data.length - 2 ? 'Далее' : 'Начать сначала'}
+						</button>
+					</div>
+				</div>
 			</div>
-			<h1>Vite + React</h1>
-			<div className="card">
-				<button onClick={() => setCount((count) => count + 1)}>
-					count is {count}
-				</button>
-				<p>
-					Edit <code>src/App.jsx</code> and save to test HMR
-				</p>
-				<CurrentYear />
-			</div>
-			<p className="read-the-docs">
-				Click on the Vite and React logos to learn more
-			</p>
-		</>
+		</div>
 	);
-}
-
-export default App;
+};
